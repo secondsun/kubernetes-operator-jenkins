@@ -16,7 +16,7 @@ spec:
       serviceAccountName: jenkins-operator
       containers:
         - name: jenkins-operator
-          image: virtuslab/jenkins-operator:v0.4.0
+          image: quay.io/secondsun/jenkins-operator:6f65d1c8-dirty
           command:
           - jenkins-operator
           args: []

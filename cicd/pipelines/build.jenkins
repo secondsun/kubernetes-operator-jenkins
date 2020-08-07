@@ -3,11 +3,11 @@
 def label = "build-jenkins-operator-${UUID.randomUUID().toString()}"
 def home = "/home/jenkins"
 def workspace = "${home}/workspace/build-jenkins-operator"
-def workdir = "${workspace}/src/github.com/jenkinsci/kubernetes-operator/"
+def workdir = "${workspace}/src/github.com/secondsun/kubernetes-operator/"
 
 podTemplate(label: label,
         containers: [
-                containerTemplate(name: 'jnlp', image: 'jenkins/inbound-agent:alpine'),
+                containerTemplate(name: 'jnlp', image: 'quay.io/secondsun/inbound-agent:alpine'),
                 containerTemplate(name: 'go', image: 'golang:1-alpine', command: 'cat', ttyEnabled: true),
         ],
         envVars: [

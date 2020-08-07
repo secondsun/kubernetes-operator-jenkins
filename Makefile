@@ -1,6 +1,7 @@
 # Set POSIX sh for maximum interoperability
 SHELL := /bin/sh
 PATH  := $(GOPATH)/bin:$(PATH)
+GO_ARCH ?= amd64
 
 OSFLAG 				:=
 ifeq ($(OS),Windows_NT)
@@ -121,12 +122,13 @@ build: deepcopy-gen $(NAME) ## Builds a dynamic executable or package
 .PHONY: $(NAME)
 $(NAME): $(wildcard *.go) $(wildcard */*.go) VERSION.txt
 	@echo "+ $@"
-	CGO_ENABLED=0 go build -tags "$(BUILDTAGS)" ${GO_LDFLAGS} -o build/_output/bin/jenkins-operator $(BUILD_PATH)
+	@echo "$GO_ARCH"
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(GO_ARCH) go build -tags "$(BUILDTAGS)" ${GO_LDFLAGS} -o build/_output/bin/jenkins-operator $(BUILD_PATH)
 
 .PHONY: static
 static: ## Builds a static executable
 	@echo "+ $@"
-	CGO_ENABLED=0 go build \
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(GO_ARCH) go build \
 				-tags "$(BUILDTAGS) static_build" \
 				${GO_LDFLAGS_STATIC} -o $(NAME) $(BUILD_PATH)
 
@@ -309,13 +311,30 @@ container-runtime-login: ## Log in into the Docker repository
 	@echo "+ $@"
 
 .PHONY: container-runtime-build
-container-runtime-build: check-env ## Build the container
+container-runtime-build: container-runtime-build-amd64 container-runtime-build-aarch64 container-manifest
+
+.PHONY: container-runtime-build-amd64
+container-runtime-build-amd64: check-env ## Build the container
 	@echo "+ $@"
 	$(CONTAINER_RUNTIME_COMMAND) build \
 	--build-arg GO_VERSION=$(GO_VERSION) \
+	--build-arg GO_ARCH=amd64 \
+	--build-arg ARCH=amd64 \
 	--build-arg OPERATOR_SDK_VERSION=$(OPERATOR_SDK_VERSION) \
-	-t $(DOCKER_REGISTRY):$(GITCOMMIT) . \
+	-t $(DOCKER_REGISTRY):$(GITCOMMIT)-amd64 . \
 	--file build/Dockerfile $(CONTAINER_RUNTIME_EXTRA_ARGS)
+
+.PHONY: container-runtime-build-aarch64
+container-runtime-build-aarch64: check-env ## Build the container
+	@echo "+ $@"
+	$(CONTAINER_RUNTIME_COMMAND) build \
+	--build-arg GO_ARCH=arm64 \
+	--build-arg ARCH=arm64v8 \
+	--build-arg GO_VERSION=$(GO_VERSION) \
+	--build-arg OPERATOR_SDK_VERSION=$(OPERATOR_SDK_VERSION) \
+	-t $(DOCKER_REGISTRY):$(GITCOMMIT)-arm64 . \
+	--file build/Dockerfile $(CONTAINER_RUNTIME_EXTRA_ARGS)
+
 
 .PHONY: container-runtime-images
 container-runtime-images: ## List all local containers
@@ -515,3 +534,10 @@ generate-docs: ## Re-generate docs directory from the website directory
 	@echo "+ $@"
 	rm -rf docs || echo "Cannot remove docs dir, ignoring"
 	hugo -s website -d ../docs
+
+.PHONY: container-manifest
+container-manifest: ## Create the manifest with amd64 and arm64 images
+	$(CONTAINER_RUNTIME_COMMAND) manifest create \
+	  $(DOCKER_REGISTRY):$(GITCOMMIT) \
+	  --amend $(DOCKER_REGISTRY):$(GITCOMMIT)-arm64 \
+	  --amend $(DOCKER_REGISTRY):$(GITCOMMIT)-amd64

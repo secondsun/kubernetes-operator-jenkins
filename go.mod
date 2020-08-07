@@ -15,6 +15,7 @@ require (
 	github.com/golang/mock v1.3.1
 	github.com/golangci/golangci-lint v1.26.0 // indirect
 	github.com/mailgun/mailgun-go/v3 v3.6.0
+	github.com/mrtazz/checkmake v0.0.0-20200226205106-1383019b4b84 // indirect
 	github.com/openshift/api v3.9.1-0.20190924102528-32369d4db2ad+incompatible
 	github.com/operator-framework/operator-sdk v0.17.0
 	github.com/pkg/errors v0.9.1
@@ -23,8 +24,8 @@ require (
 	github.com/stretchr/testify v1.5.1
 	go.uber.org/zap v1.14.1
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
-	golang.org/x/tools v0.0.0-20200505023115-26f46d2f7ef8 // indirect
+	golang.org/x/net v0.0.0-20200625001655-4c5254603344
+	golang.org/x/tools v0.0.0-20200804234916-fec4f28ebb08 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	k8s.io/api v0.17.4
