@@ -7,7 +7,7 @@ def workdir = "${workspace}/src/github.com/secondsun/kubernetes-operator/"
 
 podTemplate(label: label,
         containers: [
-                containerTemplate(name: 'jnlp', image: 'quay.io/secondsun/jenkins-agent-debian:latest'),
+                containerTemplate(name: 'jnlp', image: 'quay.io/secondsun/jenkins-agent-debian:latest2'),
                 containerTemplate(name: 'go', image: 'golang:1-alpine', command: 'cat', ttyEnabled: true),
         ],
         envVars: [
